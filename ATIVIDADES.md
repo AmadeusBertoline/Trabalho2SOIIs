@@ -236,10 +236,9 @@ std::cout << "Not found\n";
 * *Comando de Compilação:* `g++ -o devices devices.cpp -std=c++17`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./devices)
+/dev/sda1
 ```
-* *Breve Descrição:* (Explique o que a saída significa. O dispositivo que apareceu (ex: `/dev/sda1`) é
-o que você esperava para a sua partição raiz? Por quê?)
+* *Breve Descrição:* O programa leu o /proc/mounts e retornou /dev/sda1. Sim, era o que eu esperava, pois /dev/sda1 é a partição de bloco tipicamente montada no diretório raiz (/) em muitas configurações Linux. A saída confirma o objetivo do código: identificar o dispositivo associado ao ponto de montagem raiz.
 #### `getuuid.c` (Livro-Texto p. 161-162)
 * **Objetivo do Código:** Usar a biblioteca `libblkid` para listar todas as partições de um disco
 (ex: `/dev/sda`) e imprimir seus atributos, como **UUID**, **LABEL** e **TYPE**.
@@ -289,10 +288,11 @@ return 0;
 * *Comando de Compilação:* `gcc -o getuuid getuuid.c -lblkid`
 * *Saída da Execução:* (Execute com `sudo ./getuuid /dev/sda`)
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Número de partições em /dev/sda: 3
+Partição: /dev/sda1, UUID=c89cdce0-932b-47d4-8135-4ffe2af5d9c8, LABEL=null, TYPE=ext4
+Partição: /dev/sda2, PTTYPE="dos" PARTUUID="7aa506dc-02"
 ```
-* *Breve Descrição:* (A saída listou corretamente suas partições, como `sda1` e `sda5`? Os tipos
-`ext4` e `swap` correspondem ao que você viu no `lsblk -f`?)
+* *Breve Descrição:* A saída listou 3 partições no disco /dev/sda. A partição /dev/sda1 foi listada corretamente com UUID e TYPE=ext4. A /dev/sda2 foi listada com um PARTUUID (que é um tipo de entrada de partição estendida/lógica no blkid), o que corresponde a como a biblioteca libblkid mapeia as partições do disco. O resultado confirma o objetivo de listar atributos da partição.
 ---
 ### Códigos do Capítulo 7 (Processos)
 #### `teste.c` (Livro-Texto p. 181-182)
@@ -310,9 +310,9 @@ return 0;
 * *Comando de Compilação:* `gcc -o teste teste.c`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./teste)
+Aied é 10, Aied é TOP, tá no Youtube
 ```
-* *Breve Descrição:* (O programa imprimiu a string esperada no terminal?)
+* *Breve Descrição:* Sim, o programa imprimiu a string esperada no terminal. Isso confirma que o ciclo de compilação (pré-processamento, compilação, montagem e ligação) foi bem-sucedido e o executável foi criado corretamente.
 #### `myblkid.cpp` (Livro-Texto p. 186-187)
 * **Objetivo do Código:** Demonstrar como um programa C++ pode usar a biblioteca `libblkid`
 (uma biblioteca C) para obter o UUID de uma partição específica (neste caso, `/dev/sda1`).
@@ -341,10 +341,9 @@ return 0;
 * *Comando de Compilação:* `g++ -o myblkid myblkid.cpp -lblkid`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar sudo ./myblkid)
+UUID=c89cdce0-932b-47d4-8135-4ffe2af5d9c8
 ```
-* *Breve Descrição:* (A saída corresponde ao UUID da sua partição `sda1` que você viu no `lsblk
--f`?)
+* *Breve Descrição:* A saída mostra o UUID específico da partição /dev/sda1. O valor é o mesmo que foi visto no getuuid.c, o que indica que a chamada à biblioteca libblkid funcionou corretamente em C++ para obter a identificação única do disco.
 #### `calcfb.cpp` (Livro-Texto p. 187)
 *(Esta prática requer dois arquivos)*
 * **Objetivo do Código:** Demonstrar como criar e usar uma biblioteca de cabeçalho (`.h`)
@@ -372,10 +371,10 @@ return 0;
 * *Comando de Compilação:* `g++ -o calcfb calcfb.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./calcfb)
+F4: 3
 ```
-* *Breve Descrição:* (A saída foi `F4: 3`? Explique por que o resultado é 3 e não 4, com base na
-sequência de Fibonacci).
+* *Breve Descrição:* Análise da Saída:
+A saída foi F4: 3. O resultado é 3 porque a Sequência de Fibonacci começa em F0=0 e F1=1. A sequência é F_n = F_{n-1} + F_{n-2}.
 #### `thread.cpp` (Livro-Texto p. 190)
 * **Objetivo do Código:** Demonstrar a criação de múltiplas threads que executam
 concorrentemente com a thread principal (`main`).
@@ -401,10 +400,10 @@ return 0;
 * *Comando de Compilação:* `g++ thread.cpp -o thread -pthread -std=c++11`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./thread)
+A 'main' executou...
+A thread está falando: Olá
 ```
-* *Breve Descrição:* (Qual linha imprimiu primeiro, "A 'main' executou..." ou "A thread está
-falando..."? O que `t1.join()` faz?)
+* *Breve Descrição:* A linha "A 'main' executou..." imprimiu primeiro. Isso acontece porque, embora a thread t1 comece a rodar concorrentemente com a main, a execução da cout na main é muito rápida. O comando t1.join() faz com que a thread principal (main) pause sua execução e espere até que a thread t1 termine, garantindo que a mensagem da t1 seja exibida antes que o programa encerre.
 #### `usefork.cpp` (Livro-Texto p. 191)
 * **Objetivo do Código:** Demonstrar a chamada `fork()`. O programa se clona; o pai e o filho
 executam o *mesmo* código, mas alteram variáveis diferentes, provando que têm espaços de
@@ -448,10 +447,10 @@ return 0;
 * *Comando de Compilação:* `g++ -o usefork usefork.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui as DUAS linhas de saída do seu terminal)
+Processo pai: Variavel Global: 2 Variável Funcao: 20
+Processo filho: Variavel Global: 3 Variável Funcao: 21
 ```
-* *Breve Descrição:* (Explique por que a `variavelGlobal` e a `variavelFuncao` têm valores diferentes
-para o pai e para o filho. Qual processo (pai ou filho) terminou primeiro na sua execução?)
+* *Breve Descrição:* O processo pai manteve os valores originais (2 e 20), e o processo filho incrementou os valores (3 e 21). Isso acontece porque a chamada fork() cria uma cópia exata do espaço de endereçamento do pai para o filho. Qualquer alteração que o filho faça nas suas variáveis (como variavelGlobal++) é feita somente na sua cópia de memória, sem afetar a memória do processo pai. Na minha execução, o Processo Pai terminou primeiro, pois sua execução era mais simples e não tinha código extra no if (pID > 0).
 #### `usewait.cpp` (Livro-Texto p. 193)
 * **Objetivo do Código:** Demonstrar a chamada `wait()`. O processo-pai usa `wait(NULL)`
 para pausar sua própria execution e aguardar que o processo-filho termine antes de
@@ -488,10 +487,12 @@ return 0;
 * *Comando de Compilação:* `g++ -o usewait usewait.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Pai esperando o filho terminar...
+Saindo do processo filho.
+PID do pai: 3671
+PID do filho (retornado por wait): 3672
 ```
-* *Breve Descrição:* (A linha "Pai esperando..." sempre aparece antes de "PID do pai..."? Por que o
-PID do filho é impresso pelo processo-pai?)
+* *Breve Descrição:* Sim, a linha "Pai esperando..." sempre aparece antes de "PID do pai...". Isso ocorre porque a função wait(NULL) é bloqueante: ela pausa a execução do pai até que qualquer um dos seus filhos termine. A última linha do pai só é executada após o filho ter terminado e o wait() ter retornado. O PID do filho (cpid) é impresso pelo processo-pai porque o wait() retorna o Process ID (PID) do filho que acabou de terminar, permitindo ao pai saber quem ele estava esperando.
 #### `usewait_exit.cpp` (Livro-Texto p. 194)
 * **Objetivo do Código:** Expandir o `wait()`, mostrando como o pai pode capturar o *código de
 saída* (status) do filho, usando `WIFEXITED` e `WEXITSTATUS`.
