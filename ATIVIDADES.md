@@ -80,37 +80,115 @@ userlinux@debian:~$
 ```
 ### Capítulo 9: Práticas de Redes
 #### Prática 0002 checkpoint03 (Livro-Texto p. 286)
-* **Resumo da Prática:** (Descreva brevemente o que você fez: configuração de IP estático
-editando o arquivo `/etc/network/interfaces` e reiniciando a máquina).
+* **Resumo da Prática:** Nessa prática, eu configurei a rede da máquina virtual no modo NAT pelo VirtualBox. Depois, liguei o Debian e editei o arquivo /etc/network/interfaces para definir um IP estático. Coloquei o endereço 10.0.2.3, máscara 255.255.255.0, gateway 10.0.2.2 e o DNS 8.8.8.8. Por fim, reiniciei a máquina para aplicar as configurações.
 * **Evidência de Validação:**
 ```bash
 # Saída do comando 'ip address show enp0s3'
-(Cole aqui a saída do 'ip address' mostrando o IP 10.0.2.3)
+userlinux@debian:~$ ip address show enp0s3
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:4f:63:fd brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
+       valid_lft 85890sec preferred_lft 85890sec
+    inet 10.0.2.3/24 scope global secondary enp0s3
+       valid_lft forever preferred_lft forever
+    inet6 fd00:a00:27ff:fe4f:63fd/64 scope global dynamic mngtmpaddr
+       valid_lft 86108sec preferred_lft 14108sec
+    inet6 fe80::a00:27ff:fe4f:63fd/64 scope link 
+       valid_lft forever preferred_lft forever
+userlinux@debian:~$
 # Saída do comando 'ip route'
-(Cole aqui a saída do 'ip route' mostrando o gateway 10.0.2.2)
+userlinux@debian:~$ ip route
+default via 10.0.2.2 dev enp0s3
+10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.15
+169.254.0.0/16 dev enp0s3 scope link metric 1000
+userlinux@debian:~$
 # Saída do comando 'cat /etc/network/interfaces'
-(Cole aqui o conteúdo do seu arquivo /etc/network/interfaces)
+userlinux@debian:~$ cat /etc/network/interfaces
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto enp0s3
+iface enp0s3 inet dhcp
+userlinux@debian:~$
 ```
 #### Prática 0002 checkpoint04 (Livro-Texto p. 287)
-* **Resumo da Prática:** (Descreva brevemente o que você fez: configuração da rede para
-DHCP no arquivo e, em seguida, configuração de IP estático via comandos `ip address` e `ip
-route`).
+* **Resumo da Prática:** Configurei a VM com adaptador em modo NAT, apaguei os campos de IP da interface enp0s3 e ativei o DHCP automático. Depois reiniciei a VM e configurei manualmente o IP, máscara, gateway e DNS pelo terminal.
 * **Evidência de Validação:**
 ```bash
 # Saída do comando 'ip address show enp0s3'
-(Cole aqui a saída do 'ip address' mostrando o IP 10.0.2.3)
+userlinux@debian:~$ ip address show enp0s3
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:4f:63:fd brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
+       valid_lft 85890sec preferred_lft 85890sec
+    inet 10.0.2.3/24 scope global secondary enp0s3
+       valid_lft forever preferred_lft forever
+    inet6 fd00:a00:27ff:fe4f:63fd/64 scope global dynamic mngtmpaddr
+       valid_lft 86108sec preferred_lft 14108sec
+    inet6 fe80::a00:27ff:fe4f:63fd/64 scope link 
+       valid_lft forever preferred_lft forever
+userlinux@debian:~$
 # Saída do comando 'ip route'
-(Cole aqui a saída do 'ip route' mostrando o gateway 10.0.2.2)
+userlinux@debian:~$ ip route
+default via 10.0.2.2 dev enp0s3
+10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.15
+169.254.0.0/16 dev enp0s3 scope link metric 1000
+userlinux@debian:~$
 # Saída do comando 'cat /etc/network/interfaces'
-(Cole aqui o conteúdo do seu /etc/network/interfaces mostrando a configuração DHCP)
+userlinux@debian:~$ cat /etc/network/interfaces
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto enp0s3
+iface enp0s3 inet dhcp
+userlinux@debian:~$
 ```
 #### Prática 0002 checkpoint05 (Livro-Texto p. 288)
-* **Resumo da Prática:** (Descreva brevemente o que você fez: download de um arquivo
-usando `wget` para o diretório `/tmp`).
+* **Resumo da Prática:** Realizei o download de um arquivo python através de wget e o guardei na pasta.
 * **Evidência de Validação:**
 ```bash
 # Saída do comando 'cat /tmp/install.py'
-(Cole aqui a saída do cat, que deve ser "aied.com.br")
+userlinux@debian:~$ cat /tmp/install.py
+#!/usr/bin/python3
+import os
+import sys
+import platform
+
+machine2bits = {'AMD64': 64, 'x86_64': 64, 'i386': 32, 'x86': 32, 'i686': 32}
+os_version = machine2bits.get(platform.machine(), None)
+
+os.system("apt update")
+os.system("wget -O /tmp/libjsoncpp1_1.7.4-3_amd64.deb http://ftp.br.debian.org/debian/pool/main/libj/libjsoncpp/libjsoncpp1_1.7.4-3_amd64.deb")
+os.system("dpkg -i /tmp/libjsoncpp1_1.7.4-3_amd64.deb")
+os.system("apt install libjsoncpp-dev -y")
+os.system("apt install g++ -y")
+os.system("apt install libcurl4-openssl-dev -y")
+os.system("rm -r /etc/aied/")
+os.system("rm -r /etc/aied/")
+os.system("mkdir /etc/aied/")
+os.system("wget -O /tmp/aied.tar.gz http://www.aied.com.br/linux/download/aied_" + str(os_version) + ".tar.gz")
+os.system("tar -xzvf /tmp/aied.tar.gz -C /etc/aied/")
+os.system("rm /usr/sbin/aied")
+os.system("rm /usr/bin/aied.py")
+os.system("ln -s /etc/aied/aied_" + str(os_version) + " /usr/bin/aied")
+os.system("chmod +x /etc/aied/aied_" + str(os_version) + " ")
+
+#OK, será usado para isntalacao do aied.com.br
+userlinux@debian:~$
 ```
 ---
 ## ATIVIDADE 2: Mapa Mental (Conceitos Chave)
