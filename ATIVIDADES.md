@@ -11,34 +11,72 @@ sala, conforme solicitado no final de cada capítulo do livro-texto.
 texto dos comandos de validação solicitados. **Não use imagens (printscreens)**.
 ### Capítulo 6: Práticas de Discos e Montagem
 #### Prática 8b65b431 01 (Livro-Texto p. 171)
-* **Resumo da Prática:** (Descreva brevemente o que você fez: adição do disco,
-particionamento com `fdisk`, formatação com `mkfs.ext4` e configuração da montagem
-automática no `/etc/fstab` para o diretório `/backup`).
+* **Resumo da Prática:** Eu adicionei um novo disco na máquina virtual pelo VirtualBox e, depois que o Debian reconheceu o disco, criei uma partição nele usando o fdisk. Em seguida, formatei essa partição com mkfs.ext4. Depois disso, editei o arquivo /etc/fstab para que o sistema montasse automaticamente essa partição no diretório /backup toda vez que o Debian for iniciado. Por fim, reiniciei a máquina para confirmar que tudo estava funcionando corretamente.
 * **Evidência de Validação:**
 ```bash
 # Saída do comando 'cat /etc/fstab'
-(Cole aqui a saída do seu 'cat /etc/fstab')
+userlinux@debian:~$ cat /etc/fstab
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# systemd generates mount units based on this file, see systemd.mount(5).
+# Please run 'systemctl daemon-reload' after making changes here.
+#
+# <file system> <mount point> <type> <options> <dump> <pass>
+# / was on /dev/sda1 during installation
+UUID=c89cdce0-932b-47d4-8135-4ffe2af5d9c8 / ext4 errors=remount-ro 0 1
+# swap was on /dev/sda5 during installation
+UUID=6c18730a-955a-4c04-ab3d-5e1190f6143a none swap sw 0 0
+/dev/sr0 /media/cdrom0 udf,iso9660 user,noauto 0 0
+UUID=069076e5-db6e-4a57-b38b-c1b560933cf7 /backup ext4 defaults 0 2
+UUID=e5751f0f-7e18-4849-a7dd-7e1cd0136248 /backup ext4 defaults 0 2
+#UUID=2f41f9411-0b02-4f16-9221-ef736fb2f840 /backup ext4 defaults 0 2
+userlinux@debian:~$
 # Saída do comando 'df -h'
-(Cole aqui a saída do seu 'df -h' mostrando o /backup montado)
+userlinux@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            959M     0  959M   0% /dev
+tmpfs           197M  560K  197M   1% /run
+/dev/sda1        19G  2.7G   15G  15% /
+tmpfs           984M     0  984M   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+/dev/sdb1        20G   24K   19G   1% /backup
+tmpfs           197M     0  197M   0% /run/user/1000
+userlinux@debian:~$
 ```
 #### Prática 8b65b431 02 (Livro-Texto p. 172)
-* **Resumo da Prática:** (Descreva brevemente o que você fez: criação do diretório `cdrom` e
-montagem manual do dispositivo `/dev/sr0` nele).
+* **Resumo da Prática:** Eu criei o diretório cdrom dentro da minha home para servir como ponto de montagem. Depois, usei o comando mount para montar manualmente o dispositivo /dev/sr0 (o CD-ROM configurado com a imagem ISO) dentro desse diretório. Assim, pude acessar os arquivos do CD pela pasta /home/userlinux/cdrom.
 * **Evidência de Validação:**
 ```bash
 # Saída do comando 'df -h'
-(Cole aqui a saída do seu 'df -h' mostrando o /dev/sr0 montado)
-# Saída do comando 'cat /home/usuario/cdrom/arquivo.txt'
-(Cole aqui a saída do cat, que deve ser "AIED VIVO")
+userlinux@debian:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            959M     0  959M   0% /dev
+tmpfs           197M  568K  197M   1% /run
+/dev/sda1        19G  2.7G   15G  15% /
+tmpfs           984M     0  984M   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+/dev/sdb1        20G   24K   19G   1% /backup
+tmpfs           197M     0  197M   0% /run/user/1000
+/dev/sr0         58M   58M    0  100% /home/userlinux/cdrom
+userlinux@debian:~$
+userlinux@debian:~$ cat /home/userlinux/cdrom/arquivo.txt
+AIED VIVO
+userlinux@debian:~$
+
 ```
 ### Capítulo 7: Práticas de Processos
 #### Prática prc0001 01 (Livro-Texto p. 233)
-* **Resumo da Prática:** (Descreva brevemente o que você fez: execução dos comandos
-`locale-gen`, `script`, a listagem de processos com `ps` e a filtragem por `python`).
+Nessa prática, eu entrei no diretório home com o comando cd ~/. Depois, gerei a configuração de idioma usando sudo locale-gen "en_US.UTF-8". Em seguida, utilizei o comando script para começar a gravar tudo que aparecia no terminal. Após isso, usei o comando ps para listar os processos em execução e filtrei somente os que continham “python”. Por fim, finalizei a gravação com o comando exit.
 * **Evidência de Validação:**
 ```bash
 # Saída do comando 'cat /home/usuario/typescript' (após filtrar por 'python')
-(Cole aqui a saída do seu 'ps aux | grep python' conforme capturado pelo 'typescript')
+(userlinux@debian:~$ ps aux | grep python
+userlin+    761  0.0  0.1   6340  2164 tty1     S+   21:52   0:00 grep python
+userlinux@debian:~$
 ```
 ### Capítulo 9: Práticas de Redes
 #### Prática 0002 checkpoint03 (Livro-Texto p. 286)
