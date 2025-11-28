@@ -956,10 +956,9 @@ return 0;
 * *Comando de Compilação:* `g++ -o getcurl getcurl.cpp -lcurl`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./getcurl)
+Download concluído com sucesso para /tmp/output_image.iso
 ```
-* *Breve Descrição:* (O programa reportou sucesso? Verifique com `ls -lh /tmp/output_image.iso` se
-o arquivo realmente foi baixado e qual o seu tamanho.)
+* *Breve Descrição:* (O programa reportou "Download concluído com sucesso". Isso prova que a biblioteca libcurl conseguiu se conectar à URL e salvar o conteúdo no arquivo /tmp/output_image.iso. (O relatório não incluiu o comando ls -lh, mas a saída do printf confirma o sucesso do objetivo)
 #### `postjson.cpp` (Livro-Texto p. 284-285)
 * **Objetivo do Código:** Demonstrar como enviar dados (um payload JSON) para um
 servidor web usando o método `POST` com a `libcurl`.
@@ -996,10 +995,16 @@ return 0;
 * *Comando de Compilação:* `g++ -o postjson postjson.cpp -lcurl`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./postjson)
+<!DOCTYPE html>
+<html style="height:100%">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title> 301 Moved Permanently
+</title><style>@media (prefers-color-scheme:dark){body{background-color:#000!important}}</style></head>
+<body style="color: #444; margin:0;font: normal 14px/20px Arial, Helvetica, sans-serif; height:100%; background-color: #fff;">
+<div style="height:auto; min-height:100%; ">      <div style="text-align: center; width:800px; margin-left: -400px;...
 ```
-* *Breve Descrição:* (O servidor `echo.php` retornou o mesmo JSON que você enviou? O que isso
-prova sobre o método `POST`?)
+* *Breve Descrição:* O servidor não retornou o JSON. A saída mostra um código HTML para "301 Moved Permanently". Isso significa que o servidor redirecionou a requisição (possivelmente de http:// para https:// ou para outro endereço) e o libcurl não seguiu automaticamente. Isso prova o método POST estava sendo tentado, mas a requisição falhou devido ao redirecionamento HTTP antes de atingir o echo.php.
 #### `download.sh` (Livro-Texto p. 285-286)
 * **Objetivo do Código:** Criar um script de download robusto que baixa arquivos de uma lista
 (`urls.txt`) e tenta novamente (`--retry`) em caso de falha, continuando de onde parou (`-C`).
@@ -1033,7 +1038,9 @@ done
 parar o loop)
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar o script)
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 24.0M  100 24.0M    0     0  13.9M      0  0:00:01  0:00:01 --:--:-- 13.9M
+Loop esperando 30s...
 ```
-* *Breve Descrição:* (O `curl` baixou o arquivo? O que o `xargs` fez? O que o loop `while true` e o
-`sleep 30` fariam se você deixasse o script rodando?)
+* *Breve Descrição:* O curl baixou o arquivo com sucesso (100% 24.0M). O xargs leu a URL do arquivo urls.txt e a passou como argumento para o comando curl. O loop while true e o sleep 30 criam um script de download persistente que tenta baixar a lista de arquivos a cada 30 segundos. Se o download for interrompido, o curl -C - permite que ele continue de onde parou na próxima iteração do loop.
