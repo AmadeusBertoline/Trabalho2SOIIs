@@ -532,14 +532,15 @@ return 0;
 * *Comando de Compilação:* `gcc -o usewait_exit usewait_exit.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Saindo do processo filho.
+WEXIT: 1
+PID do pai: 3673
+PID do filho: 3674
 ```
 * *Breve Descrição:* (Qual foi o status de saída impresso pelo `WEXIT`? Por que ele imprimiu esse
 valor específico?)
 #### `waitpid.cpp` (Livro-Texto p. 195)
-* **Objetivo do Código:** Demonstrar o `waitpid()` para gerenciar *múltiplos* filhos. O pai cria 5
-filhos, e então espera por *cada um* deles especificamente, coletando seus códigos de saída
-(100 a 104).
+* **Objetivo do Código:** O status de saída impresso pelo WEXIT foi 1. Ele imprimiu esse valor porque o processo filho chamou exit(1). O wait(&stat) no pai captura o status de término do filho. A macro WIFEXITED(stat) verifica se o filho terminou normalmente e, em caso afirmativo, WEXITSTATUS(stat) extrai o código de saída passado para exit().
 * **Código-Fonte:**
 ```cpp
 // (p. 195)
@@ -572,10 +573,13 @@ return 0;
 * *Comando de Compilação:* `g++ -o waitpid waitpid.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui as 5 linhas de saída do seu terminal)
+O filho 3680 terminou com o status: 104
+O filho 3679 terminou com o status: 103
+O filho 3678 terminou com o status: 102
+O filho 3677 terminou com o status: 101
+O filho 3676 terminou com o status: 100
 ```
-* *Breve Descrição:* (Os PIDs dos filhos apareceram em ordem? Os códigos de status (100-104)
-apareceram em ordem? O que `waitpid()` faz de diferente do `wait()`?)
+* *Breve Descrição:* Os PIDs dos filhos não apareceram em ordem numérica (ex: 3676 é o primeiro a ser criado, mas foi o último a ser esperado). No entanto, os códigos de status (100-104) apareceram na ordem correta de espera, do 104 ao 100. O waitpid() difere do wait() porque permite ao processo-pai esperar por um PID específico (o primeiro argumento, pid[i]) ou por um grupo de PIDs, e não apenas pelo primeiro filho que terminar. Neste caso, o pai espera em ordem pelos PIDs que ele criou no array pid.
 #### `system.cpp` (Livro-Texto p. 196)
 * **Objetivo do Código:** Demonstrar a função `system()`, que é um atalho (e geralmente
 inseguro) para `fork + exec + wait`. O programa C++ pausa, executa um comando de shell (`ls
@@ -595,10 +599,14 @@ return 0;
 * *Comando de Compilação:* `g++ -o system system.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+total 16
+-rwxr-xr-x 1 aluno aluno 8568 Nov 28 01:16 devices
+-rw-r--r-- 1 aluno aluno 458 Nov 28 01:16 devices.cpp
+-rwxr-xr-x 1 aluno aluno 8568 Nov 28 01:16 getuuid
+-rw-r--r-- 1 aluno aluno 858 Nov 28 01:16 getuuid.c
+Executado
 ```
-* *Breve Descrição:* (O que apareceu na tela? A lista de arquivos (`ls -l`) apareceu *antes* ou
-*depois* da palavra "Executado"? Por quê?)
+* *Breve Descrição:* Apareceu a lista de arquivos do diretório onde o programa foi executado (saída do ls -l), e depois a palavra "Executado". O ls -l apareceu antes porque a função system("ls -l") é bloqueante. Ela pausa a execução do programa C++ (o processo-pai), executa o comando de shell (que faz um fork e um exec), e só retorna para a próxima linha (std::cout << "Executado") após o comando de shell ter completado e sua saída ter sido impressa.
 #### `pop.cpp` (Livro-Texto p. 197)
 * **Objetivo do Código:** Demonstrar a função `popen()` (pipe open). Similar ao `system()`, ele
 executa um comando, mas permite ao programa C++ *capturar* a saída do comando (`ls -l`) e
@@ -628,10 +636,13 @@ return 0;
 * *Comando de Compilação:* `g++ -o pop pop.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Linha: total 16
+Linha: -rwxr-xr-x 1 aluno aluno 8568 Nov 28 01:16 devices
+Linha: -rw-r--r-- 1 aluno aluno 458 Nov 28 01:16 devices.cpp
+Linha: -rwxr-xr-x 1 aluno aluno 8568 Nov 28 01:16 getuuid
+Linha: -rw-r--r-- 1 aluno aluno 858 Nov 28 01:16 getuuid.c
 ```
-* *Breve Descrição:* (Qual a diferença da saída deste programa para a saída do `system.cpp`? O
-que o `popen` permitiu fazer com a saída do `ls -l`?)
+* *Breve Descrição:* A diferença para a saída do system.cpp é que, em vez de o comando ls -l imprimir sua saída diretamente no terminal, a saída é capturada e prefixada com a string "**Linha: **" pelo programa C++. O popen() permitiu ao programa C++ ler a saída padrão (STDOUT) do comando ls -l linha por linha através de um pipe (fpipe) e processá-la internamente (imprimindo "Linha: ") antes de exibi-la.
 #### `receivesignal.cpp` (Livro-Texto p. 203)
 * **Objetivo do Código:** Demonstrar como um processo pode "capturar" (handle) um sinal.
 Este programa entra em loop infinito, mas se o usuário pressionar `Ctrl+C` (que envia o sinal
@@ -660,10 +671,12 @@ return 0;
 * *Comando de Compilação:* `g++ -o receivesignal receivesignal.cpp`
 * *Saída da Execução:* (Deixe o programa rodar por 3 segundos e então pressione `Ctrl+C`)
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+^CProcesso será interrompido pelo sinal: (2).
 ```
-* *Breve Descrição:* (O que aconteceu quando você pressionou `Ctrl+C`? O programa fechou
-silenciosamente ou imprimiu a mensagem da `signal_handler`? Qual é o número do sinal `SIGINT`?)
+* *Breve Descrição:* Quando pressionei Ctrl+C, o programa não fechou silenciosamente; ele imprimiu a mensagem da função signal_handler ("Processo será interrompido..."). O Ctrl+C envia o sinal SIGINT, cujo número é 2. O programa foi configurado com signal(SIGINT, signal_handler) para que, ao invés da ação padrão de fechar, ele chame a nossa função para tratar o sinal antes de chamar exit(2).
 #### `ignoresignal.cpp` (Livro-Texto p. 204)
 * **Objetivo do Código:** Demonstrar como um processo pode *ignorar* ativamente um sinal.
 Este programa é similar ao anterior, mas usa `SIG_IGN` para se tornar imune ao `Ctrl+C`
@@ -690,10 +703,14 @@ return 0;
 * *Saída da Execução:* (Pressione `Ctrl+C` várias vezes. Para parar, use `Ctrl+\` (SIGQUIT) ou `kill -9`
 de outro terminal).
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Estou em loop imune... (1)
+Estou em loop imune... (2)
+Estou em loop imune... (3)
+^C^C^CEstou em loop imune... (4)
+Estou em loop imune... (5)
+Estou em loop imune... (6)
 ```
-* *Breve Descrição:* (O que aconteceu quando você pressionou `Ctrl+C`? O programa parou? Como
-você conseguiu parar o programa?)
+* *Breve Descrição:* Quando pressionei Ctrl+C várias vezes, o programa não parou. O Ctrl+C (SIGINT) foi ignorado. O programa continuou executando o while(1). Eu consegui parar o programa pressionando Ctrl+\\ (que envia o sinal SIGQUIT), ou usando o comando kill de outro terminal com o PID do programa. O uso de signal(SIGINT, SIG_IGN) configurou o handler do sinal para ser IGNORADO.
 #### `raisesignal.cpp` (Livro-Texto p. 204-205)
 * **Objetivo do Código:** Demonstrar como um processo pode enviar um sinal *para si mesmo*
 usando a função `raise()`. O programa irá rodar por 5 segundos e então se autoenviar um
@@ -726,10 +743,14 @@ return 0;
 * *Comando de Compilação:* `g++ -o raisesignal raisesignal.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Auto-sinal recebido: (2).
 ```
-* *Breve Descrição:* (O que aconteceu após 5 segundos? O programa parou sozinho? Por que a
-função `signal_handler` foi chamada?)
+* *Breve Descrição:* Após 5 segundos, o programa parou sozinho. Ele parou porque, no quinto ciclo do loop, a função raise(SIGINT) foi chamada, o que faz com que o processo envie o sinal SIGINT (2) para si mesmo. Como havíamos configurado o signal_handler para o SIGINT, a função foi chamada, imprimiu a mensagem e encerrou o programa com exit(2).
 #### `killsignal.cpp` (Livro-Texto p. 205)
 * **Objetivo do Código:** Demonstrar como um processo pode enviar um sinal para si mesmo
 usando `kill()`. É similar ao `raise()`, mas requer que o processo saiba o seu próprio PID.
@@ -763,7 +784,12 @@ return 0;
 * *Comando de Compilação:* `g++ -o killsignal killsignal.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Dentro do laço de repetição infinito.
+Processo será interrompido pelo sinal: (10).
 ```
 * *Breve Descrição:* (O que aconteceu após 5 segundos? Qual o número do sinal `SIGUSR1` que
 apareceu na saída?)
@@ -819,10 +845,21 @@ return 0;
 * *Comando de Compilação:* `g++ -o forksignal forksignal.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal)
+Processo filho aguardando sinal...
+Pai enviando sinal para o filho 3684.
+Processo pai aguardando resposta...
+Processo (FILHO) recebeu sinal: (10).
+Filho enviando sinal de volta ao pai...
+Processo (PAI) recebeu sinal: (10).
+Pai terminando.
 ```
-* *Breve Descrição:* (Descreva a ordem dos eventos. O pai enviou o sinal? O filho recebeu? O filho
-enviou de volta? O que o comando `pause()` fez em ambos os processos?)
+* *Breve Descrição:* Análise da Saída: A ordem dos eventos foi:
+O Pai fez fork, o Filho começou e chamou pause().
+O Pai esperou 2s (sleep(2)) e enviou o sinal ao filho.
+O Filho recebeu o sinal (10) e saiu do pause().
+O Filho enviou o sinal de volta para o pai (getppid()).
+O Pai recebeu o sinal (10) e saiu do seu pause().
+O Pai chamou wait(NULL) para limpar o filho e terminou. O comando pause() fez com que ambos os processos bloqueassem sua execução e só fossem acordados/retornassem quando recebessem o sinal SIGUSR1 (10).
 ---
 ### Códigos do Capítulo 9 (Redes)
 #### `resolveaied.cpp` (Livro-Texto p. 264)
@@ -851,9 +888,9 @@ return 0;
 * *Comando de Compilação:* `g++ -o resolveaied resolveaied.cpp`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./resolveaied)
+212.1.209.207
 ```
-* *Breve Descrição:* (Qual endereço IP foi retornado para `www.aied.com.br`?)
+* *Breve Descrição:* O endereço IP retornado para www.aied.com.br foi 212.1.209.207. Isso demonstra que o programa executou corretamente uma consulta DNS básica usando gethostbyname e traduziu o nome de domínio para seu endereço IP.
 #### `testport.cpp` (Livro-Texto p. 276)
 * **Objetivo do Código:** Testar se uma porta TCP específica (porta 80) está aberta em um
 servidor remoto (`aied.com.br`). Requer a biblioteca SFML.
@@ -879,9 +916,9 @@ return 0;
 * *Comando de Compilação:* `g++ -o testport testport.cpp -lsfml-network -lsfml-system`
 * *Saída da Execução:*
 ```bash
-(Cole aqui a saída exata do seu terminal ao rodar ./testport)
+./executartudo.sh: line 94: ./testport: No such file or directory
 ```
-* *Breve Descrição:* (A porta 80 (HTTP) do servidor `aied.com.br` estava aberta ou fechada?)
+* *Breve Descrição:* O relatório indica um erro: "./testport: No such file or directory". Isso significa que o programa não foi executado. O erro sugere que a compilação ou a execução falhou porque o arquivo executável testport não foi encontrado no diretório esperado. Portanto, não foi possível determinar se a porta 80 do aied.com.br estava aberta ou fechada.
 #### `getcurl.cpp` (Livro-Texto p. 283-284)
 * **Objetivo do Código:** Demonstrar como fazer o download de um arquivo (uma imagem
 `.iso`) de uma URL usando a biblioteca `libcurl` em C++.
